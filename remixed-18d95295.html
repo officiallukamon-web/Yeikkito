@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Para Michelle ♡</title>
+
+  <!-- Tipografías -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ════════════════════════════════════════════════════════════
+     *  TOKENS — Fuente única de verdad para colores y espaciado
+     * ════════════════════════════════════════════════════════════ */
+    :root {
+      /* Color */
+      --accent:          #C8A882;
+      --accent-dim:      rgba(200, 168, 130, 0.5);
+      --glass-bg:        rgba(9, 8, 14, 0.38);
+      --glass-border:    rgba(255, 255, 255, 0.07);
+      --text-primary:    rgba(255, 255, 255, 0.88);
+      --text-secondary:  rgba(255, 255, 255, 0.42);
+      --text-ghost:      rgba(255, 255, 255, 0.14);
+      --error:           rgba(210, 90, 90, 0.85);
+
+      /* Espaciado */
+      --pad:   clamp(1.5rem, 3.5vw, 2.75rem);
+      --blur:  18px;
+      --r:     14px;
+
+      /* Transición del fondo */
+      --bg-transition: 1.4s ease;
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  RESET
+     * ════════════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      margin: 0; padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: #09080C;
+      color: var(--text-primary);
+    }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    textarea, input { font-family: inherit; }
+
+    /* ════════════════════════════════════════════════════════════
+     *  FONDO — Dos capas con crossfade
+     * ════════════════════════════════════════════════════════════ */
+    .bg-layer {
+      position: fixed; inset: 0;
+      background-size: cover;
+      background-position: center center;
+      will-change: opacity;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity var(--bg-transition);
+    }
+
+    /* Gradiente oscurecedor: más en bordes, transparente al centro */
+    .bg-vignette {
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 80% at center, transparent 20%, rgba(0,0,0,0.48) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.38) 0%, transparent 35%, transparent 60%, rgba(0,0,0,0.52) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  GLASS — Mixin reutilizable via clase
+     * ════════════════════════════════════════════════════════════ */
+    .glass {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  DASHBOARD — Contenedor fantasma
+     * ════════════════════════════════════════════════════════════ */
+    .dashboard {
+      position: fixed; inset: 0;
+      z-index: 2;
+      pointer-events: none; /* Los hijos activan según necesiten */
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  RELOJ — Arriba izquierda | Firma editorial del sitio
+     * ════════════════════════════════════════════════════════════ */
+    .clock-widget {
+      position: fixed;
+      top: var(--pad); left: var(--pad);
+      pointer-events: auto;
+      user-select: none;
+    }
+
+    .clock-main {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.2em;
+      line-height: 1;
+    }
+
+    .clock-hhmm {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(4rem, 9vw, 8rem);
+      font-weight: 300;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+    }
+
+    /* Segundos como superíndice tipográfico */
+    .clock-ss {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.8rem, 1.4vw, 1.05rem);
+      font-weight: 300;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      margin-bottom: 0.6em;
+    }
+
+    .clock-date {
+      margin-top: 0.3rem;
+      font-size: clamp(0.6rem, 1vw, 0.75rem);
+      font-weight: 400;
+      color: var(--text-secondary);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  BOTÓN CAMBIAR FONDO — Arriba derecha
+     * ════════════════════════════════════════════════════════════ */
+    .btn-bg-toggle {
+      position: fixed;
+      top: var(--pad); right: var(--pad);
+      pointer-events: auto;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary);
+      transition: color 0.3s, border-color 0.3s, transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .btn-bg-toggle:hover {
+      color: var(--text-primary);
+      border-color: rgba(255,255,255,0.18);
+      transform: rotate(90deg);
+    }
+    .btn-bg-toggle svg { width: 15px; height: 15px; }
+
+    /* ════════════════════════════════════════════════════════════
+     *  QUOTE WIDGET — Centro absoluto
+     * ════════════════════════════════════════════════════════════ */
+    .quote-widget {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: clamp(260px, 42vw, 540px);
+      text-align: center;
+      pointer-events: none;
+      animation: fadeRise 1.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    @keyframes fadeRise {
+      from { opacity: 0; transform: translate(-50%, calc(-50% + 22px)); }
+      to   { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    /* Línea ornamental */
+    .quote-ornament {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 1.4rem;
+    }
+    .quote-ornament::before,
+    .quote-ornament::after {
+      content: '';
+      display: block;
+      width: 28px; height: 1px;
+      background: var(--accent-dim);
+    }
+    .quote-ornament-dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.6;
+    }
+
+    .quote-text {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(1.05rem, 2.4vw, 1.55rem);
+      font-weight: 300;
+      line-height: 1.7;
+      letter-spacing: 0.01em;
+      color: var(--text-primary);
+      transition: color 0.6s;
+    }
+    .quote-text.is-default {
+      color: var(--text-secondary);
+    }
+
+    .quote-author {
+      display: block;
+      margin-top: 1.1rem;
+      font-size: clamp(0.58rem, 1vw, 0.7rem);
+      font-weight: 400;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.7;
+    }
+
+    .note-timer {
+      display: block;
+      margin-top: 0.45rem;
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-ghost);
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  SPOTIFY — Abajo izquierda
+     * ════════════════════════════════════════════════════════════ */
+    .spotify-widget {
+      position: fixed;
+      bottom: var(--pad); left: var(--pad);
+      pointer-events: auto;
+    }
+
+    .btn-spotify {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      transition: color 0.3s, border-color 0.3s;
+    }
+    .btn-spotify:hover {
+      color: var(--text-primary);
+      border-color: rgba(255,255,255,0.18);
+    }
+    .btn-spotify svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    .spotify-panel {
+      margin-top: 0.7rem;
+      transform-origin: bottom left;
+      transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.38s;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .spotify-panel.is-hidden {
+      transform: scale(0.88) translateY(8px);
+      opacity: 0;
+      pointer-events: none;
+      position: absolute; /* Evita que ocupe espacio en el layout */
+    }
+    .spotify-panel iframe {
+      display: block;
+      border: none;
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  TEXTO SECRETO — Abajo derecha
+     * ════════════════════════════════════════════════════════════ */
+    .secret-trigger {
+      position: fixed;
+      bottom: calc(var(--pad) + 0.1rem); right: var(--pad);
+      pointer-events: auto;
+      font-size: clamp(0.55rem, 0.9vw, 0.65rem);
+      font-weight: 400;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-ghost);
+      user-select: none;
+      cursor: default;
+      transition: color 0.5s;
+    }
+    .secret-trigger:hover {
+      color: rgba(255, 255, 255, 0.28);
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  MODALES — Overlay compartido
+     * ════════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      animation: overlayIn 0.28s ease both;
+    }
+    .modal-overlay.is-hidden { display: none; }
+
+    @keyframes overlayIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .modal-card {
+      background: rgba(10, 8, 14, 0.94);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: clamp(1.8rem, 4vw, 2.6rem) clamp(1.6rem, 4vw, 2.2rem);
+      width: clamp(290px, 88vw, 400px);
+      text-align: center;
+      animation: cardIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(24px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-glyph {
+      display: block;
+      font-size: 1.5rem;
+      color: var(--accent);
+      opacity: 0.75;
+      margin-bottom: 1rem;
+    }
+
+    .modal-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin-bottom: 1.6rem;
+    }
+
+    /* Input de contraseña y textarea */
+    .modal-input,
+    .modal-textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .modal-input:focus,
+    .modal-textarea:focus {
+      border-color: rgba(200, 168, 130, 0.4);
+    }
+    .modal-input::placeholder,
+    .modal-textarea::placeholder {
+      color: var(--text-ghost);
+      letter-spacing: 0.08em;
+    }
+
+    .modal-input {
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-align: center;
+    }
+
+    .modal-textarea {
+      padding: 0.85rem 1rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      line-height: 1.65;
+      min-height: 120px;
+      resize: none;
+      text-align: left;
+    }
+
+    /* Mensaje de error */
+    .modal-error {
+      margin-top: 0.65rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--error);
+    }
+    .modal-error.is-hidden { display: none; }
+
+    /* Botones del modal */
+    .btn-primary {
+      display: block;
+      width: 100%;
+      margin-top: 1.1rem;
+      padding: 0.72rem 1rem;
+      border-radius: 10px;
+      background: var(--accent);
+      color: rgba(9, 8, 14, 0.92);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      transition: opacity 0.25s, transform 0.2s;
+    }
+    .btn-primary:hover  { opacity: 0.82; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); opacity: 0.95; }
+
+    .btn-ghost {
+      display: block;
+      width: 100%;
+      margin-top: 0.55rem;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      color: var(--text-ghost);
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      transition: color 0.3s, border-color 0.3s;
+    }
+    .btn-ghost:hover {
+      color: var(--text-secondary);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  CONTADOR DE CARACTERES
+     * ════════════════════════════════════════════════════════════ */
+    .char-counter {
+      display: block;
+      text-align: right;
+      margin-top: 0.4rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      color: var(--text-ghost);
+      transition: color 0.3s;
+    }
+    .char-counter.is-near { color: var(--accent); opacity: 0.7; }
+
+    /* ════════════════════════════════════════════════════════════
+     *  TOAST — Notificación efímera
+     * ════════════════════════════════════════════════════════════ */
+    .toast {
+      position: fixed;
+      bottom: 2.2rem; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: rgba(200, 168, 130, 0.12);
+      border: 1px solid rgba(200, 168, 130, 0.28);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 20px;
+      padding: 0.55rem 1.3rem;
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.38s, transform 0.38s;
+    }
+    .toast.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  ANIMACIÓN DE ERROR (shake)
+     * ════════════════════════════════════════════════════════════ */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      18%       { transform: translateX(-7px); }
+      36%       { transform: translateX(7px); }
+      54%       { transform: translateX(-4px); }
+      72%       { transform: translateX(4px); }
+    }
+    .do-shake { animation: shake 0.42s ease; }
+
+    /* ════════════════════════════════════════════════════════════
+     *  RESPONSIVE — Ajustes en pantallas muy pequeñas
+     * ════════════════════════════════════════════════════════════ */
+    @media (max-width: 480px) {
+      .spotify-panel iframe { width: 260px !important; }
+      .quote-widget { width: 88vw; }
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  ACCESIBILIDAD — Motion reducido
+     * ════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ╔═══════════════════════════════════════════╗
+       ║  FONDO — Capas A y B para crossfade suave ║
+       ╚═══════════════════════════════════════════╝ -->
+  <div id="bg-a" class="bg-layer"></div>
+  <div id="bg-b" class="bg-layer"></div>
+  <div class="bg-vignette"></div>
+
+  <!-- ╔═══════════════════════════════════════════╗
+       ║  DASHBOARD                                ║
+       ╚═══════════════════════════════════════════╝ -->
+  <main class="dashboard" role="main">
+
+    <!-- ── RELOJ (arriba izquierda) ─────────────── -->
+    <section class="clock-widget" aria-label="Reloj">
+      <div class="clock-main">
+        <span class="clock-hhmm" id="clock-hhmm">00:00</span>
+        <span class="clock-ss"   id="clock-ss">00</span>
+      </div>
+      <div class="clock-date" id="clock-date">lunes, 1 enero</div>
+    </section>
+
+    <!-- ── BOTÓN CAMBIAR FONDO (arriba derecha) ─── -->
+    <button class="btn-bg-toggle" id="btn-bg-toggle" aria-label="Cambiar fondo de pantalla">
+      <!-- Icono sol / cambio -->
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="8" cy="8" r="2.5"/>
+        <line x1="8"   y1="1"   x2="8"   y2="2.5"/>
+        <line x1="8"   y1="13.5" x2="8"   y2="15"/>
+        <line x1="1"   y1="8"   x2="2.5" y2="8"/>
+        <line x1="13.5" y1="8"  x2="15"  y2="8"/>
+        <line x1="3.05" y1="3.05" x2="4.11" y2="4.11"/>
+        <line x1="11.89" y1="11.89" x2="12.95" y2="12.95"/>
+        <line x1="3.05" y1="12.95" x2="4.11" y2="11.89"/>
+        <line x1="11.89" y1="4.11" x2="12.95" y2="3.05"/>
+      </svg>
+    </button>
+
+    <!-- ── QUOTE (centro) ───────────────────────── -->
+    <section class="quote-widget" id="quote-widget" aria-live="polite" aria-label="Nota del día">
+      <div class="quote-ornament" aria-hidden="true">
+        <span class="quote-ornament-dot"></span>
+      </div>
+      <p class="quote-text is-default" id="quote-text">cargando tu nota...</p>
+      <span class="quote-author" id="quote-author">— con amor, Luka ♡</span>
+      <span class="note-timer"  id="note-timer"></span>
+    </section>
+
+    <!-- ── SPOTIFY (abajo izquierda) ────────────── -->
+    <section class="spotify-widget" aria-label="Reproductor de música">
+      <button class="btn-spotify" id="btn-spotify" aria-expanded="false" aria-controls="spotify-panel">
+        <!-- Icono Spotify -->
+        <svg viewBox="0 0 168 168" fill="currentColor" aria-hidden="true">
+          <path d="M84 0a84 84 0 1 0 0 168A84 84 0 0 0 84 0zm38.6 121.1a5.23 5.23 0 0 1-7.2 1.74c-19.7-12.04-44.5-14.77-73.7-8.1a5.23 5.23 0 1 1-2.33-10.2c31.97-7.3 59.4-4.16 81.5 9.35a5.23 5.23 0 0 1 1.73 7.2zm10.3-22.9a6.54 6.54 0 0 1-9 2.18C101.4 87.3 67.6 83.5 41.3 91.1a6.54 6.54 0 1 1-3.8-12.52c29.9-9.07 67.1-4.67 92.4 12.67a6.54 6.54 0 0 1 2.18 9zm.88-23.8C108.2 58.5 63.1 57 38.1 64.7a7.85 7.85 0 1 1-4.56-15.05c28.7-8.7 76.4-7.02 106.5 11.36a7.85 7.85 0 0 1-6.26 14.42z"/>
+        </svg>
+        <span id="spotify-label">música</span>
+      </button>
+
+      <div class="spotify-panel is-hidden" id="spotify-panel">
+        <!--
+          ╔══════════════════════════════════════════════════════════╗
+          ║  LUKA → Reemplaza PLAYLIST_ID con el ID de tu playlist. ║
+          ║  Lo encuentras en la URL de Spotify:                    ║
+          ║  open.spotify.com/playlist/[PLAYLIST_ID]                ║
+          ║                                                         ║
+          ║  Cambia también el ancho (width) si quieres.            ║
+          ╚══════════════════════════════════════════════════════════╝
+        -->
+        <iframe
+          id="spotify-iframe"
+          src="about:blank"
+          data-src="https://open.spotify.com/embed/playlist/REEMPLAZA_CON_TU_PLAYLIST_ID?utm_source=generator&theme=0"
+          width="300"
+          height="152"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+          title="Spotify Player"
+          style="border-radius:12px;">
+        </iframe>
+      </div>
+    </section>
+
+    <!-- ── TEXTO SECRETO (abajo derecha) ─────────── -->
+    <!--
+      NOTA PARA LUKA:
+      Triple-clic aquí → solicita contraseña → panel de edición de nota.
+      El texto está casi invisible (color ghost) para no romper la estética.
+    -->
+    <div class="secret-trigger" id="secret-trigger" aria-hidden="true">
+      Michelle te amo
+    </div>
+
+  </main>
+
+  <!-- ╔═══════════════════════════════════════════╗
+       ║  MODAL — Contraseña de admin              ║
+       ╚═══════════════════════════════════════════╝ -->
+  <div id="modal-auth" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="auth-heading">
+    <div class="modal-card">
+      <span class="modal-glyph" aria-hidden="true">✦</span>
+      <p  class="modal-heading" id="auth-heading">acceso privado</p>
+
+      <input
+        type="password"
+        id="auth-input"
+        class="modal-input"
+        placeholder="clave secreta..."
+        autocomplete="off"
+        spellcheck="false"
+        maxlength="64"
+      />
+
+      <p class="modal-error is-hidden" id="auth-error" role="alert">
+        clave incorrecta
+      </p>
+
+      <button class="btn-primary" id="btn-auth-submit">entrar</button>
+      <button class="btn-ghost"   id="btn-auth-cancel">cancelar</button>
+    </div>
+  </div>
+
+  <!-- ╔═══════════════════════════════════════════╗
+       ║  MODAL — Editor de nota del día           ║
+       ╚═══════════════════════════════════════════╝ -->
+  <div id="modal-note" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="note-heading">
+    <div class="modal-card">
+      <span class="modal-glyph" aria-hidden="true">♡</span>
+      <p  class="modal-heading" id="note-heading">nota del día</p>
+
+      <textarea
+        id="note-textarea"
+        class="modal-textarea"
+        placeholder="escribe algo bonito para Michelle..."
+        maxlength="280"
+        spellcheck="true"
+        aria-label="Contenido de la nota"
+      ></textarea>
+
+      <span class="char-counter" id="char-counter">0 / 280</span>
+
+      <button class="btn-primary" id="btn-note-submit">Publicar</button>
+      <button class="btn-ghost"   id="btn-note-close">cerrar</button>
+    </div>
+  </div>
+
+  <!-- ╔═══════════════════════════════════════════╗
+       ║  TOAST                                    ║
+       ╚═══════════════════════════════════════════╝ -->
+  <div class="toast" id="toast" aria-live="assertive" aria-atomic="true"></div>
+
+
+  <script>
+    /* ════════════════════════════════════════════════════════════════
+     *  MICHELLE'S DASHBOARD — Escrito por Luka  ♡
+     * ════════════════════════════════════════════════════════════════
+     *
+     *  Arquitectura de módulos:
+     *    CONFIG          → Todas las constantes personalizables
+     *    Utils           → Helpers compartidos
+     *    BackgroundModule→ Crossfade de fotos de fondo
+     *    ClockModule     → Reloj en tiempo real
+     *    NotesModule     → Notas efímeras de 24h (localStorage)
+     *    AdminModule     → Easter egg: triple-clic → contraseña → editor
+     *    SpotifyModule   → Toggle del reproductor
+     *
+     *  Para migrar notas a Firebase:
+     *    Busca el bloque "STORAGE ADAPTER" en NotesModule y reemplaza
+     *    las funciones adapter.load() y adapter.save() con llamadas
+     *    al SDK de Firebase Realtime Database. El resto del código
+     *    no cambia.
+     * ════════════════════════════════════════════════════════════════ */
+
+    'use strict';
+
+    /* ────────────────────────────────────────────────────────────────
+     *  CONFIG — Todo lo que Luka puede personalizar sin tocar lógica
+     * ──────────────────────────────────────────────────────────────── */
+    const CONFIG = {
+
+      /**
+       * LUKA → Reemplaza estas URLs con fotos reales de Michelle.
+       * Puedes usar enlaces de Google Drive (modo "cualquiera con el enlace"),
+       * Cloudinary, Imgur u otro servicio de hosting de imágenes.
+       *
+       * Formatos soportados: JPG, JPEG, PNG, WEBP.
+       * Recomendación: 1920×1080 o mayor para que se vea bien en monitores grandes.
+       */
+      backgrounds: [
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80',
+        'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1920&q=80',
+        'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1920&q=80',
+        'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1920&q=80',
+        'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?w=1920&q=80',
+      ],
+
+      /** Contraseña para el panel de administración */
+      adminPassword: 'AmoaminovioLuka',
+
+      /** Texto que aparece cuando no hay nota activa o ya expiró */
+      defaultNote: 'Hoy, mañana y siempre... ♡',
+
+      /** Atribución que aparece debajo de la nota */
+      noteAuthor: '— con amor, Luka ♡',
+
+      /** Clave de almacenamiento local */
+      storageKey: 'michelle_note_v1',
+
+      /** Duración de cada nota en milisegundos (24 horas) */
+      noteTTL: 24 * 60 * 60 * 1000,
+    };
+
+    /* ────────────────────────────────────────────────────────────────
+     *  UTILIDADES
+     * ──────────────────────────────────────────────────────────────── */
+    const Utils = {
+      /** Obtener elemento por ID */
+      el: (id) => document.getElementById(id),
+
+      /** Añadir cero a la izquierda */
+      pad: (n) => String(n).padStart(2, '0'),
+
+      /**
+       * Mostrar una notificación flotante (toast).
+       * @param {string} message — Texto a mostrar
+       * @param {number} [duration=2800] — Duración en ms
+       */
+      toast(message, duration = 2800) {
+        const t = this.el('toast');
+        t.textContent = message;
+        t.classList.add('is-visible');
+        clearTimeout(this._toastTimer);
+        this._toastTimer = setTimeout(() => t.classList.remove('is-visible'), duration);
+      },
+    };
+
+    /* ────────────────────────────────────────────────────────────────
+     *  MÓDULO: BACKGROUND
+     *
+     *  Técnica de crossfade:
+     *  Dos capas (bg-a, bg-b) apiladas. Cuando se cambia el fondo,
+     *  la capa inactiva recibe la nueva imagen y sube su opacidad
+     *  mientras la activa la baja. El ojo ve una transición suave.
+     *  Preload() garantiza que la imagen esté en caché antes del fade.
+     * ──────────────────────────────────────────────────────────────── */
+    const BackgroundModule = (() => {
+      const layerA = Utils.el('bg-a');
+      const layerB = Utils.el('bg-b');
+      const btn    = Utils.el('btn-bg-toggle');
+
+      let currentIndex  = 0;
+      let activeLayer   = 'a'; // 'a' | 'b'
+
+      /** Precarga una imagen en el navegador sin mostrarla */
+      function preload(url) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload  = () => resolve(url);
+          img.onerror = () => resolve(url); // Resuelve igualmente para no bloquear
+          img.src = url;
+        });
+      }
+
+      /**
+       * Muestra el fondo en el índice dado.
+       * @param {number}  index   — Índice en CONFIG.backgrounds
+       * @param {boolean} instant — Si true, sin transición (para el primer load)
+       */
+      async function set(index, instant = false) {
+        const url     = CONFIG.backgrounds[index];
+        const next    = activeLayer === 'a' ? layerB : layerA;
+        const current = activeLayer === 'a' ? layerA : layerB;
+
+        if (!instant) await preload(url);
+
+        next.style.backgroundImage = `url('${url}')`;
+
+        if (instant) {
+          next.style.transition  = 'none';
+          next.style.opacity     = '1';
+          current.style.opacity  = '0';
+          // Restaurar transición en el próximo frame
+          requestAnimationFrame(() => { next.style.transition = ''; });
+        } else {
+          next.style.opacity    = '1';
+          current.style.opacity = '0';
+        }
+
+        activeLayer   = activeLayer === 'a' ? 'b' : 'a';
+        currentIndex  = index;
+      }
+
+      function next() {
+        const idx = (currentIndex + 1) % CONFIG.backgrounds.length;
+        set(idx);
+      }
+
+      function init() {
+        // Primer fondo: instantáneo para eliminar cualquier flash
+        set(0, true);
+
+        // Precargar el resto en segundo plano
+        CONFIG.backgrounds.slice(1).forEach(preload);
+
+        // Botón de cambio
+        btn.addEventListener('click', next);
+      }
+
+      return { init, next, set };
+    })();
+
+    /* ────────────────────────────────────────────────────────────────
+     *  MÓDULO: RELOJ
+     *
+     *  Usa requestAnimationFrame para alinearse con los repaints del
+     *  navegador. Solo actualiza el DOM cuando el valor cambia
+     *  (minutos para HH:MM, cada frame para los segundos).
+     * ──────────────────────────────────────────────────────────────── */
+    const ClockModule = (() => {
+      const elHHMM = Utils.el('clock-hhmm');
+      const elSS   = Utils.el('clock-ss');
+      const elDate = Utils.el('clock-date');
+
+      const DAYS   = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+      const MONTHS = ['enero','febrero','marzo','abril','mayo','junio',
+                      'julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+      let prevMinute = -1;
+      let prevSecond = -1;
+
+      function tick() {
+        const now = new Date();
+        const h   = now.getHours();
+        const m   = now.getMinutes();
+        const s   = now.getSeconds();
+
+        // Segundos: actualizar cada segundo
+        if (s !== prevSecond) {
+          elSS.textContent = Utils.pad(s);
+          prevSecond = s;
+        }
+
+        // HH:MM y fecha: actualizar solo cuando cambia el minuto
+        if (m !== prevMinute) {
+          elHHMM.textContent = `${Utils.pad(h)}:${Utils.pad(m)}`;
+          elDate.textContent = `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+          prevMinute = m;
+          // Sincronizar el countdown de la nota activa
+          NotesModule.updateTimer();
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      function init() { requestAnimationFrame(tick); }
+
+      return { init };
+    })();
+
+    /* ────────────────────────────────────────────────────────────────
+     *  MÓDULO: NOTAS EFÍMERAS
+     *
+     *  Estructura de una nota en localStorage:
+     *  {
+     *    text:      "texto de la nota",
+     *    timestamp: 1719100800000   ← Date.now() al publicar
+     *  }
+     *
+     *  Una nota es válida si: Date.now() - timestamp < CONFIG.noteTTL
+     *
+     *  ┌──────────────────────────────────────────────────────────┐
+     *  │  STORAGE ADAPTER — Para migrar a Firebase:               │
+     *  │  Reemplaza adapter.load() y adapter.save() con llamadas  │
+     *  │  a tu Realtime Database. El resto del módulo no cambia.  │
+     *  │                                                          │
+     *  │  Ejemplo Firebase:                                       │
+     *  │    adapter.save = async (note) =>                        │
+     *  │      await set(ref(db, 'notes/current'), note);          │
+     *  │    adapter.load = async () =>                            │
+     *  │      (await get(ref(db, 'notes/current'))).val();        │
+     *  └──────────────────────────────────────────────────────────┘
+     * ──────────────────────────────────────────────────────────────── */
+    const NotesModule = (() => {
+      const elText   = Utils.el('quote-text');
+      const elAuthor = Utils.el('quote-author');
+      const elTimer  = Utils.el('note-timer');
+
+      /* — Storage Adapter (localStorage) — */
+      const adapter = {
+        load() {
+          try {
+            const raw = localStorage.getItem(CONFIG.storageKey);
+            return raw ? JSON.parse(raw) : null;
+          } catch { return null; }
+        },
+        save(note) {
+          try {
+            localStorage.setItem(CONFIG.storageKey, JSON.stringify(note));
+            return true;
+          } catch { return false; }
+        },
+      };
+
+      function isValid(note) {
+        return note !== null && (Date.now() - note.timestamp) < CONFIG.noteTTL;
+      }
+
+      /** Formatea el tiempo restante de la nota activa */
+      function formatTimeLeft(note) {
+        const remaining = CONFIG.noteTTL - (Date.now() - note.timestamp);
+        const h = Math.floor(remaining / (1000 * 60 * 60));
+        const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        return `expira en ${h}h ${Utils.pad(m)}m`;
+      }
+
+      /** Renderiza la nota actual en el widget de quote */
+      function render() {
+        const note = adapter.load();
+
+        if (isValid(note)) {
+          elText.textContent = note.text;
+          elText.classList.remove('is-default');
+          elTimer.textContent = formatTimeLeft(note);
+        } else {
+          elText.textContent = CONFIG.defaultNote;
+          elText.classList.add('is-default');
+          elTimer.textContent = '';
+        }
+
+        elAuthor.textContent = CONFIG.noteAuthor;
+      }
+
+      /**
+       * Publica una nueva nota.
+       * @param {string} text — Contenido de la nota
+       */
+      function publish(text) {
+        const note = { text: text.trim(), timestamp: Date.now() };
+        const ok   = adapter.save(note);
+        if (ok) render();
+        return ok;
+      }
+
+      /**
+       * Actualiza solo el timer (llamado cada minuto desde ClockModule).
+       * Si la nota expiró mientras se mostraba, re-renderiza.
+       */
+      function updateTimer() {
+        const note = adapter.load();
+        if (isValid(note)) {
+          elTimer.textContent = formatTimeLeft(note);
+        } else if (elTimer.textContent !== '') {
+          // La nota acaba de expirar
+          render();
+        }
+      }
+
+      function init() { render(); }
+
+      return { init, publish, render, updateTimer };
+    })();
+
+    /* ────────────────────────────────────────────────────────────────
+     *  MÓDULO: ADMINISTRACIÓN (Easter Egg)
+     *
+     *  Flujo:
+     *  1) 3 clics en < 500ms sobre "#secret-trigger"
+     *  2) Modal de contraseña → input password
+     *  3) Si coincide con CONFIG.adminPassword → modal editor de nota
+     *  4) Al publicar → NotesModule.publish() → UI actualizada
+     * ──────────────────────────────────────────────────────────────── */
+    const AdminModule = (() => {
+      /* Referencias DOM */
+      const trigger      = Utils.el('secret-trigger');
+      const modalAuth    = Utils.el('modal-auth');
+      const authInput    = Utils.el('auth-input');
+      const authError    = Utils.el('auth-error');
+      const btnSubmitAuth= Utils.el('btn-auth-submit');
+      const btnCancelAuth= Utils.el('btn-auth-cancel');
+      const modalNote    = Utils.el('modal-note');
+      const noteTextarea = Utils.el('note-textarea');
+      const charCounter  = Utils.el('char-counter');
+      const btnSubmitNote= Utils.el('btn-note-submit');
+      const btnCloseNote = Utils.el('btn-note-close');
+
+      /* Estado del triple-click */
+      let clickCount = 0;
+      let clickTimer = null;
+
+      /* ─── Triple-click listener ─────────────────── */
+      function initTrigger() {
+        trigger.addEventListener('click', () => {
+          clickCount++;
+          clearTimeout(clickTimer);
+
+          if (clickCount >= 3) {
+            clickCount = 0;
+            openAuth();
+          } else {
+            clickTimer = setTimeout(() => { clickCount = 0; }, 500);
+          }
+        });
+      }
+
+      /* ─── Modal de autenticación ─────────────────── */
+      function openAuth() {
+        authInput.value = '';
+        authError.classList.add('is-hidden');
+        modalAuth.classList.remove('is-hidden');
+        // Focus con delay para que la animación de entrada termine
+        setTimeout(() => authInput.focus(), 320);
+      }
+
+      function closeAuth() {
+        modalAuth.classList.add('is-hidden');
+        authInput.value = '';
+        authError.classList.add('is-hidden');
+      }
+
+      function checkPassword() {
+        if (authInput.value === CONFIG.adminPassword) {
+          closeAuth();
+          openNoteEditor();
+        } else {
+          // Mostrar error + shake
+          authError.classList.remove('is-hidden');
+          authInput.value = '';
+          authInput.classList.remove('do-shake');
+          void authInput.offsetWidth; // fuerza reflow para reiniciar animación
+          authInput.classList.add('do-shake');
+          authInput.focus();
+          authInput.addEventListener('animationend', () => {
+            authInput.classList.remove('do-shake');
+          }, { once: true });
+        }
+      }
+
+      /* ─── Modal editor de nota ───────────────────── */
+      function openNoteEditor() {
+        noteTextarea.value = '';
+        charCounter.textContent = '0 / 280';
+        charCounter.classList.remove('is-near');
+        modalNote.classList.remove('is-hidden');
+        setTimeout(() => noteTextarea.focus(), 320);
+      }
+
+      function closeNoteEditor() {
+        modalNote.classList.add('is-hidden');
+        noteTextarea.value = '';
+      }
+
+      function publishNote() {
+        const text = noteTextarea.value.trim();
+        if (!text) {
+          Utils.toast('escribe algo primero ♡');
+          noteTextarea.focus();
+          return;
+        }
+        const ok = NotesModule.publish(text);
+        closeNoteEditor();
+        Utils.toast(ok ? 'nota publicada ✦' : 'error al guardar :(');
+      }
+
+      /* ─── Contador de caracteres ─────────────────── */
+      function initCharCounter() {
+        noteTextarea.addEventListener('input', () => {
+          const len = noteTextarea.value.length;
+          charCounter.textContent = `${len} / 280`;
+          charCounter.classList.toggle('is-near', len > 240);
+        });
+      }
+
+      /* ─── Event listeners ────────────────────────── */
+      function initEvents() {
+        // Auth modal
+        btnSubmitAuth.addEventListener('click', checkPassword);
+        authInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkPassword(); });
+        btnCancelAuth.addEventListener('click', closeAuth);
+        modalAuth.addEventListener('click', (e) => { if (e.target === modalAuth) closeAuth(); });
+
+        // Note modal
+        btnSubmitNote.addEventListener('click', publishNote);
+        btnCloseNote.addEventListener('click', closeNoteEditor);
+        modalNote.addEventListener('click', (e) => { if (e.target === modalNote) closeNoteEditor(); });
+
+        // Escape global
+        document.addEventListener('keydown', (e) => {
+          if (e.key !== 'Escape') return;
+          if (!modalAuth.classList.contains('is-hidden')) closeAuth();
+          if (!modalNote.classList.contains('is-hidden')) closeNoteEditor();
+        });
+
+        // Ctrl+Enter para publicar desde el textarea
+        noteTextarea.addEventListener('keydown', (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') publishNote();
+        });
+      }
+
+      function init() {
+        initTrigger();
+        initCharCounter();
+        initEvents();
+      }
+
+      return { init };
+    })();
+
+    /* ────────────────────────────────────────────────────────────────
+     *  MÓDULO: SPOTIFY
+     *
+     *  El iframe carga solo cuando se abre por primera vez.
+     *  Antes de eso, data-src guarda la URL real para no gastar
+     *  recursos si Michelle no usa el reproductor.
+     * ──────────────────────────────────────────────────────────────── */
+    const SpotifyModule = (() => {
+      const btn    = Utils.el('btn-spotify');
+      const panel  = Utils.el('spotify-panel');
+      const iframe = Utils.el('spotify-iframe');
+      const label  = Utils.el('spotify-label');
+      let   isOpen   = false;
+      let   loaded   = false;
+
+      function toggle() {
+        isOpen = !isOpen;
+
+        if (isOpen) {
+          // Lazy load: cargar iframe la primera vez que se abre
+          if (!loaded) {
+            const realSrc = iframe.getAttribute('data-src');
+            if (realSrc && !realSrc.includes('REEMPLAZA')) {
+              iframe.src = realSrc;
+            }
+            loaded = true;
+          }
+          panel.classList.remove('is-hidden');
+          btn.setAttribute('aria-expanded', 'true');
+          label.textContent = 'ocultar';
+        } else {
+          panel.classList.add('is-hidden');
+          btn.setAttribute('aria-expanded', 'false');
+          label.textContent = 'música';
+        }
+      }
+
+      function init() { btn.addEventListener('click', toggle); }
+
+      return { init };
+    })();
+
+    /* ════════════════════════════════════════════════════════════════
+     *  ARRANQUE — Inicializar todos los módulos
+     * ════════════════════════════════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', () => {
+      BackgroundModule.init();   // Fondos + preload
+      ClockModule.init();        // Reloj en tiempo real
+      NotesModule.init();        // Notas con timestamp
+      AdminModule.init();        // Easter egg + editor
+      SpotifyModule.init();      // Toggle reproductor
+    });
+
+    /* ════════════════════════════════════════════════════════════════
+     *  CONSOLA SECRETITA — Por si Michelle inspecciona el código ;)
+     * ════════════════════════════════════════════════════════════════ */
+    console.log('%c♡ Hecho con amor para Michelle, por Luka ♡', [
+      'font-family: Georgia, serif',
+      'font-size: 14px',
+      'color: #C8A882',
+      'padding: 6px 12px',
+    ].join(';'));
+  </script>
+
+</body>
+</html>
